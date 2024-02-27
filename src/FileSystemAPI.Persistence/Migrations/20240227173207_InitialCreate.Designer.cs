@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FileSystemAPI.Persistence.Migrations
 {
     [DbContext(typeof(FileSystemDbContext))]
-    [Migration("20240226194003_InitialCreate")]
+    [Migration("20240227173207_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -27,11 +27,11 @@ namespace FileSystemAPI.Persistence.Migrations
 
             modelBuilder.Entity("FileSystemAPI.Domain.Entities.File", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("bigint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<bool>("Active")
                         .HasColumnType("bit");
@@ -47,8 +47,8 @@ namespace FileSystemAPI.Persistence.Migrations
                         .HasMaxLength(128)
                         .HasColumnType("nvarchar(128)");
 
-                    b.Property<int>("FolderId")
-                        .HasColumnType("int");
+                    b.Property<long>("FolderId")
+                        .HasColumnType("bigint");
 
                     b.Property<DateTime?>("LastModifiedDate")
                         .HasColumnType("datetime2");
@@ -69,11 +69,11 @@ namespace FileSystemAPI.Persistence.Migrations
 
             modelBuilder.Entity("FileSystemAPI.Domain.Entities.Folder", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("bigint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<bool>("Active")
                         .HasColumnType("bit");
@@ -92,8 +92,8 @@ namespace FileSystemAPI.Persistence.Migrations
                     b.Property<DateTime?>("LastModifiedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("ParentFolderId")
-                        .HasColumnType("int");
+                    b.Property<long?>("ParentFolderId")
+                        .HasColumnType("bigint");
 
                     b.Property<long>("Size")
                         .HasColumnType("bigint");
@@ -107,7 +107,7 @@ namespace FileSystemAPI.Persistence.Migrations
                     b.HasData(
                         new
                         {
-                            Id = -1,
+                            Id = -1L,
                             Active = true,
                             CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FolderName = "",

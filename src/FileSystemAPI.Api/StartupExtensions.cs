@@ -1,5 +1,6 @@
 ﻿using FileSystemAPI.Persistence;
 using FileSystemAPI.Application;
+using FileSystemAPI.Infrastructure;
 
 namespace FileSystemAPI.Api
 {
@@ -9,6 +10,7 @@ namespace FileSystemAPI.Api
         public static WebApplication ConfigureServices(
             this WebApplicationBuilder builder)
         {
+            builder.Services.AddInfrastructureServices(builder.Configuration);
             builder.Services.AddPersistenceServices(builder.Configuration);
             builder.Services.AddApplicationServices(builder.Configuration);
 

@@ -9,9 +9,9 @@ namespace FileSystemAPI.Domain.Entities
 {
     public class Folder : AuditableEntity
     {
-        public int Id { get; set; }
+        public long Id { get; set; }
         public string FolderName { get; set; } = string.Empty;
-        public int? ParentFolderId { get; set; }
+        public long? ParentFolderId { get; set; }
         public long Size { get; set; }
         public bool Active { get; set; }
 

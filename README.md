@@ -1,6 +1,6 @@
 # FileSystemAPI
 
 
-dotnet ef migrations add InitialCreate --project FileSystemApi.Persistence --startup-project FileSystemApi.Api
+dotnet ef migrations add InitialCreate --project src\FileSystemApi.Persistence --startup-project src\FileSystemApi.Api
 
-dotnet ef database update --project FileSystemApi.Persistence --startup-project FileSystemApi.Api
+dotnet ef database update --project src\FileSystemApi.Persistence --startup-project src\FileSystemApi.Api

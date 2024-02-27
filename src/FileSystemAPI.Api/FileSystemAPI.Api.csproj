@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FileSystemAPI.Application\FileSystemAPI.Application.csproj" />
+    <ProjectReference Include="..\FileSystemAPI.Infrastructure\FileSystemAPI.Infrastructure.csproj" />
     <ProjectReference Include="..\FileSystemAPI.Persistence\FileSystemAPI.Persistence.csproj" />
   </ItemGroup>
 

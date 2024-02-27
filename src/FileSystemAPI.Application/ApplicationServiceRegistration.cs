@@ -1,4 +1,5 @@
-﻿using FileSystemAPI.Application.Services;
+﻿using FileSystemAPI.Application.Contracts.Services;
+using FileSystemAPI.Application.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -13,8 +14,10 @@ namespace FileSystemAPI.Application
     {
         public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddScoped<FileService>();
-            services.AddScoped<FolderService>();
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+            services.AddScoped<IFileService, FileService>();
+            services.AddScoped<IFolderService, FolderService>();
 
             return services;
         }

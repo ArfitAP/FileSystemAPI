@@ -9,6 +9,16 @@ namespace FileSystemAPI.Application.Contracts.Persistence
 {
     public interface IFileRepository : IAsyncRepository<Domain.Entities.File>
     {
+        public Task<bool> FileNameExistsInParent(string fileName, long parentFolderId);
 
+        public Task<Domain.Entities.File> GetFileByNameAndParent(string fileName, long parentFolderId);
+
+        public Task<Domain.Entities.File> AddFile(Domain.Entities.File file);
+
+        public Task<Domain.Entities.File> UpdateFile(Domain.Entities.File file, long newSize);
+
+        public Task DeleteFile(long fileId);
+
+        public Task<List<Domain.Entities.File>> GetFilesInDirectory(long parentFolderId);
     }
 }

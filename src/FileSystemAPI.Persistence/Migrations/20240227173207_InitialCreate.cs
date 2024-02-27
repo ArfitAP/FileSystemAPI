@@ -15,10 +15,10 @@ namespace FileSystemAPI.Persistence.Migrations
                 name: "Folder",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     FolderName = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
-                    ParentFolderId = table.Column<int>(type: "int", nullable: true),
+                    ParentFolderId = table.Column<long>(type: "bigint", nullable: true),
                     Size = table.Column<long>(type: "bigint", nullable: false),
                     Active = table.Column<bool>(type: "bit", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -39,12 +39,12 @@ namespace FileSystemAPI.Persistence.Migrations
                 name: "File",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     FileName = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
                     StoredFileName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Size = table.Column<long>(type: "bigint", nullable: false),
-                    FolderId = table.Column<int>(type: "int", nullable: false),
+                    FolderId = table.Column<long>(type: "bigint", nullable: false),
                     Active = table.Column<bool>(type: "bit", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     LastModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -64,7 +64,7 @@ namespace FileSystemAPI.Persistence.Migrations
             migrationBuilder.InsertData(
                 table: "Folder",
                 columns: new[] { "Id", "Active", "CreatedDate", "DeletedDate", "FolderName", "LastModifiedDate", "ParentFolderId", "Size" },
-                values: new object[] { -1, true, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, "", null, null, 0L });
+                values: new object[] { -1L, true, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, "", null, null, 0L });
 
             migrationBuilder.CreateIndex(
                 name: "IX_File_FolderId",

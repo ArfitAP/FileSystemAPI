@@ -11,13 +11,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{606400CC-9
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{82E552BC-348E-45FE-B5B2-ADD9F3586621}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileSystemAPI.Domain", "src\FileSystemAPI.Domain\FileSystemAPI.Domain.csproj", "{4BE74214-DFAD-4D6F-9837-8E681F666C8F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileSystemAPI.Domain", "src\FileSystemAPI.Domain\FileSystemAPI.Domain.csproj", "{4BE74214-DFAD-4D6F-9837-8E681F666C8F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileSystemAPI.Application", "src\FileSystemAPI.Application\FileSystemAPI.Application.csproj", "{BDA6A73A-1467-42D5-91FD-B95BC0409923}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileSystemAPI.Application", "src\FileSystemAPI.Application\FileSystemAPI.Application.csproj", "{BDA6A73A-1467-42D5-91FD-B95BC0409923}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileSystemAPI.Persistence", "src\FileSystemAPI.Persistence\FileSystemAPI.Persistence.csproj", "{EF98431E-61F1-486E-AA66-866D84582C01}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileSystemAPI.Persistence", "src\FileSystemAPI.Persistence\FileSystemAPI.Persistence.csproj", "{EF98431E-61F1-486E-AA66-866D84582C01}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileSystemAPI.Api", "src\FileSystemAPI.Api\FileSystemAPI.Api.csproj", "{052807CD-9351-4D52-B688-3F86E2745FCB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileSystemAPI.Api", "src\FileSystemAPI.Api\FileSystemAPI.Api.csproj", "{052807CD-9351-4D52-B688-3F86E2745FCB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileSystemAPI.Infrastructure", "src\FileSystemAPI.Infrastructure\FileSystemAPI.Infrastructure.csproj", "{5B9BFC1C-0068-4E1A-9116-7399D91203B5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,6 +43,10 @@ Global
 		{052807CD-9351-4D52-B688-3F86E2745FCB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{052807CD-9351-4D52-B688-3F86E2745FCB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{052807CD-9351-4D52-B688-3F86E2745FCB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B9BFC1C-0068-4E1A-9116-7399D91203B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B9BFC1C-0068-4E1A-9116-7399D91203B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B9BFC1C-0068-4E1A-9116-7399D91203B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B9BFC1C-0068-4E1A-9116-7399D91203B5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -53,6 +59,7 @@ Global
 		{BDA6A73A-1467-42D5-91FD-B95BC0409923} = {606400CC-9EB4-45F9-8C57-FA93A724D409}
 		{EF98431E-61F1-486E-AA66-866D84582C01} = {82E552BC-348E-45FE-B5B2-ADD9F3586621}
 		{052807CD-9351-4D52-B688-3F86E2745FCB} = {9A07D7CC-AB78-49F5-9B7D-543A8A15BB41}
+		{5B9BFC1C-0068-4E1A-9116-7399D91203B5} = {82E552BC-348E-45FE-B5B2-ADD9F3586621}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C1AF8A38-8C0B-4530-9F0D-01B6AB75EF14}
