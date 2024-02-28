@@ -26,7 +26,8 @@ namespace FileSystemAPI.Application.Profiles
                                                                    .ForMember(f => f.StoredFileName, opt => opt.Ignore())
                                                                    .ForMember(f => f.Active, opt => opt.Ignore());
 
-            CreateMap<Domain.Entities.File, FileModel>().ForMember(f => f.Type, opt => opt.Ignore());
+            CreateMap<Domain.Entities.File, FileModel>().ForMember(f => f.Type, opt => opt.Ignore())
+                                                        .ForMember(f => f.FullPath, opt => opt.MapFrom(f => f.Folder.FullPath));
 
             CreateMap<Folder, DirectoryListingItem>().ForMember(f => f.Type, opt => opt.MapFrom(f => (int)ItemType.Folder))
                                                      .ForMember(f => f.Name, opt => opt.MapFrom(f => f.FolderName))

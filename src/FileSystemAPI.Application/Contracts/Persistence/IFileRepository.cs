@@ -11,14 +11,18 @@ namespace FileSystemAPI.Application.Contracts.Persistence
     {
         public Task<bool> FileNameExistsInParent(string fileName, long parentFolderId);
 
+        public Task<Domain.Entities.File?> GetFileById(long fileId);
+
         public Task<Domain.Entities.File> GetFileByNameAndParent(string fileName, long parentFolderId);
 
         public Task<Domain.Entities.File> AddFile(Domain.Entities.File file);
 
         public Task<Domain.Entities.File> UpdateFile(Domain.Entities.File file, long newSize);
 
-        public Task DeleteFile(long fileId);
+        public Task DeleteFile(Domain.Entities.File file);
 
         public Task<List<Domain.Entities.File>> GetFilesInDirectory(long parentFolderId);
+
+        public Task<List<Domain.Entities.File>> SearchFile(long startFolderId, string searchString);
     }
 }

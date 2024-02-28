@@ -17,5 +17,7 @@ namespace FileSystemAPI.Application.Contracts.Services
         public Task<DeleteFileResponse> DeleteFile(DeleteFileRequest deleteFileRequest);
 
         public Task<GetFileResponse> GetFile(GetFileRequest getFileRequest);
+
+        public Task<SearchFileResponse> SearchFile(SearchFileRequest searchFileRequest);
     }
 }

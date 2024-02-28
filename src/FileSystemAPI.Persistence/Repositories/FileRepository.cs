@@ -1,5 +1,4 @@
 ﻿using FileSystemAPI.Application.Contracts.Persistence;
-using FileSystemAPI.Domain.Entities;
 using FileSystemAPI.Persistence.Repositories.Common;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -96,14 +95,12 @@ namespace FileSystemAPI.Persistence.Repositories
             return file!;
         }
 
-        public async Task DeleteFile(long fileId)
+        public async Task DeleteFile(Domain.Entities.File file)
         {
             using var transaction = _dbContext.Database.BeginTransaction();
 
             try
             {
-                Domain.Entities.File? file = await _dbContext.Files.Where(f => f.Id == fileId).SingleOrDefaultAsync();
-
                 if (file is not null)
                 {
                     var size = file.Size;
@@ -145,10 +142,19 @@ namespace FileSystemAPI.Persistence.Repositories
                                    .AnyAsync();
         }
 
+        public async Task<Domain.Entities.File?> GetFileById(long FileId)
+        {
+            return await _dbContext.Files
+                                   .Where(f => f.Id == FileId)
+                                   .Include(f => f.Folder)
+                                   .SingleOrDefaultAsync();
+        }
+
         public async Task<Domain.Entities.File> GetFileByNameAndParent(string fileName, long parentFolderId)
         {
             return await _dbContext.Files
                                    .Where(f => f.FolderId == parentFolderId && f.FileName == fileName && f.Active == true)
+                                   .Include(f => f.Folder)
                                    .SingleAsync();
         }
 
@@ -157,7 +163,42 @@ namespace FileSystemAPI.Persistence.Repositories
             return await _dbContext.Files
                                    .AsNoTracking()
                                    .Where(f => f.FolderId == parentFolderId && f.Active == true)
+                                   .Include(f => f.Folder)
                                    .ToListAsync();
+        }
+
+        public async Task<List<Domain.Entities.File>> SearchFile(long startFolderId, string searchString)
+        {
+            List<Domain.Entities.File> result = [];
+
+            LinkedList<long> folderQueue = [];
+
+            folderQueue.AddLast(startFolderId);
+
+            while (folderQueue.Any())
+            {
+                var folderId = folderQueue.First();
+
+                folderQueue.RemoveFirst();
+
+                var files = await _dbContext.Files.Where(f => f.FolderId == folderId && f.Active == true && f.FileName.StartsWith(searchString))
+                                                  .Include(f => f.Folder)
+                                                  .ToListAsync();
+
+                result.AddRange(files.Take(10 - result.Count));
+                if (result.Count >= 10) break;
+
+                var childFolders = await _dbContext.Folders.Where(f => f.ParentFolderId == folderId && f.Active == true)
+                                                           .Select(f => f.Id)
+                                                           .ToListAsync();
+
+                foreach (var child in childFolders)
+                {
+                    folderQueue.AddLast(child);                  
+                }
+            }
+
+            return result;
         }
     }
 }

@@ -16,14 +16,12 @@ namespace FileSystemAPI.Persistence.Repositories
         {
         }
 
-        public async Task DeleteFolder(long folderId)
+        public async Task DeleteFolder(Folder folder)
         {
             using var transaction = _dbContext.Database.BeginTransaction();
 
             try
             {
-                Folder? folder = await _dbContext.Folders.Where(f => f.Id == folderId).SingleOrDefaultAsync();
-
                 if (folder is not null)
                 {
                     var size = folder.Size;
@@ -47,7 +45,7 @@ namespace FileSystemAPI.Persistence.Repositories
                         else parentId = null;
                     }
 
-                    await DeleteSubFolders(folderId);
+                    await DeleteSubFolders(folder.Id);
                     await _dbContext.SaveChangesAsync();
                 }
 
@@ -76,6 +74,44 @@ namespace FileSystemAPI.Persistence.Repositories
                 folder.DeletedDate = DateTime.Now;
 
                 await DeleteSubFolders(folder.Id);
+            }
+        }
+
+        public async Task RenameFolder(Folder folder, string newFolderName)
+        {
+            using var transaction = _dbContext.Database.BeginTransaction();
+
+            try
+            {
+                if (folder is not null)
+                {
+                    folder.FolderName = newFolderName;
+                    var parent = await GetByIdAsync(folder.ParentFolderId!.Value);
+                    folder.FullPath = Path.Combine(parent!.FullPath, newFolderName);
+
+                    await _dbContext.SaveChangesAsync();
+
+                    await RenameSubFolders(folder.Id, folder.FullPath);
+                    await _dbContext.SaveChangesAsync();
+                }
+
+                transaction.Commit();
+            }
+            catch (Exception)
+            {
+                transaction.Rollback();
+                throw;
+            }
+        }
+
+        private async Task RenameSubFolders(long folderId, string folderFullPath)
+        {
+            var folders = await _dbContext.Folders.Where(f => f.ParentFolderId == folderId && f.Active == true).ToListAsync();
+            foreach (var folder in folders)
+            {
+                folder.FullPath = Path.Combine(folderFullPath, folder.FolderName);
+
+                await RenameSubFolders(folder.Id, folder.FullPath);
             }
         }
 

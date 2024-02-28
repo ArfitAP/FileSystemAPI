@@ -13,7 +13,9 @@ namespace FileSystemAPI.Application.Contracts.Persistence
 
         public Task<bool> FolderNameExistsInParent(string folderName, long parentFolderId);
 
-        public Task DeleteFolder(long folderId);
+        public Task DeleteFolder(Folder folder);
+
+        public Task RenameFolder(Folder folder, string newFolderName);
 
         public Task<List<Folder>> GetFoldersInDirectory(long parentFolderId);
     }

@@ -7,6 +7,7 @@ using FileSystemAPI.Application.Requests.File;
 using FileSystemAPI.Application.Responses.File;
 using FileSystemAPI.Application.Validators.File;
 using Microsoft.Extensions.Configuration;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -47,6 +48,8 @@ namespace FileSystemAPI.Application.Services
                 {
                     createNewFileResponse.ValidationErrors.Add(error.ErrorMessage);
                 }
+
+                Log.Error(string.Join(", ", validationResult.Errors));
             }
 
             if (createNewFileResponse.Success)
@@ -56,7 +59,7 @@ namespace FileSystemAPI.Application.Services
                     if (await _folderRepository.FolderExists(createNewFileRequest.FolderID) == false)
                     {
                         throw new Exception("Parent folder does not exists !");
-                    }
+                    }              
 
                     if (await _fileRepository.FileNameExistsInParent(createNewFileRequest.FileName, createNewFileRequest.FolderID))
                     {
@@ -81,11 +84,15 @@ namespace FileSystemAPI.Application.Services
 
                         file = await _fileRepository.AddFile(file);
 
+                        var parent = await _folderRepository.GetByIdAsync(createNewFileRequest.FolderID);
+                        file.Folder = parent!;
                         createNewFileResponse.File = _mapper.Map<FileModel>(file);
                     }                   
                 }
                 catch (Exception ex)
                 {
+                    Log.Error(ex.Message);
+
                     createNewFileResponse.Success = false;
                     createNewFileResponse.Message = ex.Message;
                     return createNewFileResponse;
@@ -110,6 +117,8 @@ namespace FileSystemAPI.Application.Services
                 {
                     deleteFileResponse.ValidationErrors.Add(error.ErrorMessage);
                 }
+
+                Log.Error(string.Join(", ", validationResult.Errors));
             }
 
             if (deleteFileResponse.Success)
@@ -123,10 +132,12 @@ namespace FileSystemAPI.Application.Services
                         throw new Exception("File does not exists !");
                     }
 
-                    await _fileRepository.DeleteFile(deleteFileRequest.FileID);
+                    await _fileRepository.DeleteFile(file);
                 }
                 catch (Exception ex)
                 {
+                    Log.Error(ex.Message);
+
                     deleteFileResponse.Success = false;
                     deleteFileResponse.Message = ex.Message;
                     return deleteFileResponse;
@@ -151,6 +162,8 @@ namespace FileSystemAPI.Application.Services
                 {
                     getFileResponse.ValidationErrors.Add(error.ErrorMessage);
                 }
+
+                Log.Error(string.Join(", ", validationResult.Errors));
             }
 
             if (getFileResponse.Success)
@@ -171,6 +184,8 @@ namespace FileSystemAPI.Application.Services
                 }
                 catch (Exception ex)
                 {
+                    Log.Error(ex.Message);
+
                     getFileResponse.Success = false;
                     getFileResponse.Message = ex.Message;
                     return getFileResponse;
@@ -195,13 +210,15 @@ namespace FileSystemAPI.Application.Services
                 {
                     renameFileResponse.ValidationErrors.Add(error.ErrorMessage);
                 }
+
+                Log.Error(string.Join(", ", validationResult.Errors));
             }
 
             if (renameFileResponse.Success)
             {
                 try
                 {
-                    Domain.Entities.File? file = await _fileRepository.GetByIdAsync(renameFileRequest.FileID)!;
+                    Domain.Entities.File? file = await _fileRepository.GetFileById(renameFileRequest.FileID)!;
 
                     if (file is null || file.Active == false)
                     {
@@ -220,6 +237,8 @@ namespace FileSystemAPI.Application.Services
                 }
                 catch (Exception ex)
                 {
+                    Log.Error(ex.Message);
+
                     renameFileResponse.Success = false;
                     renameFileResponse.Message = ex.Message;
                     return renameFileResponse;
@@ -227,6 +246,57 @@ namespace FileSystemAPI.Application.Services
             }
 
             return renameFileResponse;
+        }
+
+        public async Task<SearchFileResponse> SearchFile(SearchFileRequest searchFileRequest)
+        {
+            var searchFileResponse = new SearchFileResponse();
+
+            var validator = new SearchFileValidator();
+            var validationResult = await validator.ValidateAsync(searchFileRequest);
+
+            if (validationResult.Errors.Count > 0)
+            {
+                searchFileResponse.Success = false;
+                searchFileResponse.ValidationErrors = new List<string>();
+                foreach (var error in validationResult.Errors)
+                {
+                    searchFileResponse.ValidationErrors.Add(error.ErrorMessage);
+                }
+
+                Log.Error(string.Join(", ", validationResult.Errors));
+            }
+
+            if (searchFileResponse.Success)
+            {
+                try
+                {
+                    if (searchFileRequest.AllFolders == false && await _folderRepository.FolderExists(searchFileRequest.FolderID!.Value) == false)
+                    {
+                        throw new Exception("Folder does not exists !");
+                    }
+
+                    long startFolderId = 1;
+                    if(searchFileRequest.AllFolders == false) 
+                    {
+                        startFolderId = searchFileRequest.FolderID!.Value;
+                    }
+
+                    var result = await _fileRepository.SearchFile(startFolderId, searchFileRequest.SearchString);
+
+                    searchFileResponse.SearchResult = _mapper.Map<List<FileModel>>(result);
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex.Message);
+
+                    searchFileResponse.Success = false;
+                    searchFileResponse.Message = ex.Message;
+                    return searchFileResponse;
+                }
+            }
+
+            return searchFileResponse;
         }
     }
 }

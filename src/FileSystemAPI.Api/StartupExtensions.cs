@@ -1,6 +1,7 @@
 ﻿using FileSystemAPI.Persistence;
 using FileSystemAPI.Application;
 using FileSystemAPI.Infrastructure;
+using Serilog;
 
 namespace FileSystemAPI.Api
 {
@@ -12,12 +13,20 @@ namespace FileSystemAPI.Api
         {
             builder.Services.AddInfrastructureServices(builder.Configuration);
             builder.Services.AddPersistenceServices(builder.Configuration);
-            builder.Services.AddApplicationServices(builder.Configuration);
+            builder.Services.AddApplicationServices(builder.Configuration);           
 
             builder.Services.AddControllers();
           
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
+            builder.Services.AddEasyCaching(options =>
+            {
+                //use memory cache
+                options.UseInMemory(builder.Configuration, "default", "easycaching:inmemory");
+            });
+
+            builder.Host.UseSerilog((hostingContext, loggerConfiguration) => loggerConfiguration.ReadFrom.Configuration(hostingContext.Configuration));
 
             return builder.Build();
         }

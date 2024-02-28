@@ -8,6 +8,7 @@ using FileSystemAPI.Application.Responses.Folder;
 using FileSystemAPI.Application.Validators.Folder;
 using FileSystemAPI.Domain.Common;
 using FileSystemAPI.Domain.Entities;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -44,6 +45,8 @@ namespace FileSystemAPI.Application.Services
                 {
                     createNewFolderResponse.ValidationErrors.Add(error.ErrorMessage);
                 }
+
+                Log.Error(string.Join(", ", validationResult.Errors));
             }
 
             if (createNewFolderResponse.Success)
@@ -61,6 +64,9 @@ namespace FileSystemAPI.Application.Services
 
                     var folder = _mapper.Map<Folder>(createNewFolderRequest);
                     folder.Active = true;
+                    
+                    var parent = await _folderRepository.GetByIdAsync(createNewFolderRequest.ParentFolderID);
+                    folder.FullPath = Path.Combine(parent!.FullPath, createNewFolderRequest.FolderName);
 
                     folder = await _folderRepository.AddAsync(folder);
 
@@ -68,6 +74,8 @@ namespace FileSystemAPI.Application.Services
                 }
                 catch (Exception ex) 
                 {
+                    Log.Error(ex.Message);
+
                     createNewFolderResponse.Success = false;
                     createNewFolderResponse.Message = ex.Message;
                     return createNewFolderResponse;
@@ -92,6 +100,8 @@ namespace FileSystemAPI.Application.Services
                 {
                     deleteFolderResponse.ValidationErrors.Add(error.ErrorMessage);
                 }
+
+                Log.Error(string.Join(", ", validationResult.Errors));
             }
 
             if (deleteFolderResponse.Success)
@@ -105,10 +115,12 @@ namespace FileSystemAPI.Application.Services
                         throw new Exception("Folder does not exists !");
                     }
 
-                    await _folderRepository.DeleteFolder(deleteFolderRequest.FolderID);
+                    await _folderRepository.DeleteFolder(folder);
                 }
                 catch (Exception ex)
                 {
+                    Log.Error(ex.Message);
+
                     deleteFolderResponse.Success = false;
                     deleteFolderResponse.Message = ex.Message;
                     return deleteFolderResponse;
@@ -133,6 +145,8 @@ namespace FileSystemAPI.Application.Services
                 {
                     listDirectoryResponse.ValidationErrors.Add(error.ErrorMessage);
                 }
+
+                Log.Error(string.Join(", ", validationResult.Errors));
             }
 
             if (listDirectoryResponse.Success)
@@ -155,10 +169,13 @@ namespace FileSystemAPI.Application.Services
                         .. _mapper.Map<List<DirectoryListingItem>>(files),
                     ];
 
+                    listDirectoryResponse.FullPath = folder.FullPath;
                     listDirectoryResponse.DirectoryItems = items;
                 }
                 catch (Exception ex)
                 {
+                    Log.Error(ex.Message);
+
                     listDirectoryResponse.Success = false;
                     listDirectoryResponse.Message = ex.Message;
                     return listDirectoryResponse;
@@ -183,6 +200,8 @@ namespace FileSystemAPI.Application.Services
                 {
                     renameFolderResponse.ValidationErrors.Add(error.ErrorMessage);
                 }
+
+                Log.Error(string.Join(", ", validationResult.Errors));
             }
 
             if (renameFolderResponse.Success)
@@ -200,14 +219,15 @@ namespace FileSystemAPI.Application.Services
                         throw new Exception("Folder with provided name already exists !");
                     }
 
-                    folder.FolderName = renameFolderRequest.NewFolderName;
+                    await _folderRepository.RenameFolder(folder, renameFolderRequest.NewFolderName);
 
-                    await _folderRepository.UpdateAsync(folder);
 
                     renameFolderResponse.Folder = _mapper.Map<FolderModel>(folder);
                 }
                 catch (Exception ex)
                 {
+                    Log.Error(ex.Message);
+
                     renameFolderResponse.Success = false;
                     renameFolderResponse.Message = ex.Message;
                     return renameFolderResponse;

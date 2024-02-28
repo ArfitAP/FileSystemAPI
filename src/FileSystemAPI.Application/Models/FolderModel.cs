@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace FileSystemAPI.Application.Models
@@ -17,6 +18,8 @@ namespace FileSystemAPI.Application.Models
         public string FolderName { get; set; } = string.Empty;
         public long? ParentFolderId { get; set; }
         public long Size { get; set; }
+        public string FullPath { get; set; } = string.Empty;
+        [JsonIgnore]
         public bool Active { get; set; }
 
         public List<IFileSystemItem> ChildItems = [];

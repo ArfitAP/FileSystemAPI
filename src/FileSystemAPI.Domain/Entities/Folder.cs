@@ -13,6 +13,7 @@ namespace FileSystemAPI.Domain.Entities
         public string FolderName { get; set; } = string.Empty;
         public long? ParentFolderId { get; set; }
         public long Size { get; set; }
+        public string FullPath { get; set; } = string.Empty;
         public bool Active { get; set; }
 
         public virtual List<File> Files { get; set; } = new();

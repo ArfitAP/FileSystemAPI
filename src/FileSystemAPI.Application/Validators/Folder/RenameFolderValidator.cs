@@ -19,7 +19,8 @@ namespace FileSystemAPI.Application.Validators.Folder
 
             RuleFor(p => p.FolderID)
                 .NotEmpty().WithMessage("{PropertyName} is required.")
-                .GreaterThan(-1).WithMessage("Cannot rename root !");
+                .NotEqual(1).WithMessage("Cannot rename root !")
+                .GreaterThan(0).WithMessage("Invalid {PropertyName} !");
         }
     }
 }

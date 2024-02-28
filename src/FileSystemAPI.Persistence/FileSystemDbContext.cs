@@ -39,9 +39,10 @@ namespace FileSystemAPI.Persistence
 
                 e.HasData(new Folder
                 {
-                    Id = -1,
+                    Id = 1,
                     FolderName = string.Empty,
                     ParentFolderId = null,
+                    FullPath = "\\",
                     Active = true
                 });
             });

@@ -1,4 +1,5 @@
-﻿using FileSystemAPI.Application.Contracts.Services;
+﻿using EasyCaching.Core;
+using FileSystemAPI.Application.Contracts.Services;
 using FileSystemAPI.Application.Requests.File;
 using FileSystemAPI.Application.Requests.Folder;
 using FileSystemAPI.Application.Responses.File;
@@ -13,11 +14,15 @@ namespace FileSystemAPI.Api.Controllers
     {
         private readonly IFileService _fileService;
         private readonly IFolderService _folderService;
+        private readonly IEasyCachingProviderFactory _factory;
+        private readonly IConfiguration _configuration;
 
-        public FileSystemController(IFileService fileService, IFolderService folderService) 
+        public FileSystemController(IFileService fileService, IFolderService folderService, IEasyCachingProviderFactory factory, IConfiguration configuration) 
         {
             _fileService = fileService;
             _folderService = folderService;
+            _factory = factory;
+            _configuration = configuration;
         }
 
 
@@ -147,5 +152,42 @@ namespace FileSystemAPI.Api.Controllers
             }
         }
 
+        [HttpPost("SearchFile", Name = "SearchFile")]
+        public async Task<ActionResult<SearchFileResponse>> SearchFile([FromBody] SearchFileRequest searchFileRequest)
+        {
+            var provider = _factory.GetCachingProvider("default");
+
+            string cacheKey = searchFileRequest.ToString();
+
+            if(provider.Exists(cacheKey))
+            {
+                var response = provider.Get<SearchFileResponse>(cacheKey).Value;
+
+                if (response.Success)
+                {
+                    return Ok(response);
+                }
+                else
+                {
+                    return BadRequest(response);
+                }
+            }
+            else
+            {
+                var response = await _fileService.SearchFile(searchFileRequest);
+
+                provider.Set(cacheKey, response, TimeSpan.FromMinutes(int.Parse(_configuration["easycaching:cachingDurationMinutes"]!)));
+
+                if (response.Success)
+                {
+                    return Ok(response);
+                }
+                else
+                {
+                    return BadRequest(response);
+                }
+            }
+            
+        }
     }
 }

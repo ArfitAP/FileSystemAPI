@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FileSystemAPI.Persistence.Migrations
 {
     [DbContext(typeof(FileSystemDbContext))]
-    [Migration("20240227173207_InitialCreate")]
+    [Migration("20240228195217_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -89,6 +89,10 @@ namespace FileSystemAPI.Persistence.Migrations
                         .HasMaxLength(128)
                         .HasColumnType("nvarchar(128)");
 
+                    b.Property<string>("FullPath")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime?>("LastModifiedDate")
                         .HasColumnType("datetime2");
 
@@ -107,10 +111,11 @@ namespace FileSystemAPI.Persistence.Migrations
                     b.HasData(
                         new
                         {
-                            Id = -1L,
+                            Id = 1L,
                             Active = true,
                             CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FolderName = "",
+                            FullPath = "\\",
                             Size = 0L
                         });
                 });

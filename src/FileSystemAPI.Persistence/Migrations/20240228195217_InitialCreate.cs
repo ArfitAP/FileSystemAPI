@@ -20,6 +20,7 @@ namespace FileSystemAPI.Persistence.Migrations
                     FolderName = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
                     ParentFolderId = table.Column<long>(type: "bigint", nullable: true),
                     Size = table.Column<long>(type: "bigint", nullable: false),
+                    FullPath = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Active = table.Column<bool>(type: "bit", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     LastModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -63,8 +64,8 @@ namespace FileSystemAPI.Persistence.Migrations
 
             migrationBuilder.InsertData(
                 table: "Folder",
-                columns: new[] { "Id", "Active", "CreatedDate", "DeletedDate", "FolderName", "LastModifiedDate", "ParentFolderId", "Size" },
-                values: new object[] { -1L, true, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, "", null, null, 0L });
+                columns: new[] { "Id", "Active", "CreatedDate", "DeletedDate", "FolderName", "FullPath", "LastModifiedDate", "ParentFolderId", "Size" },
+                values: new object[] { 1L, true, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, "", "\\", null, null, 0L });
 
             migrationBuilder.CreateIndex(
                 name: "IX_File_FolderId",

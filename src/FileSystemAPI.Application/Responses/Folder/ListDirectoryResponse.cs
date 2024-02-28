@@ -1,6 +1,4 @@
-﻿using FileSystemAPI.Application.Models;
-using FileSystemAPI.Application.Models.Common;
-using FileSystemAPI.Domain.Common;
+﻿using FileSystemAPI.Application.Models.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +13,8 @@ namespace FileSystemAPI.Application.Responses.Folder
         {
 
         }
+
+        public string FullPath { get; set; } = string.Empty;
 
         public IEnumerable<DirectoryListingItem> DirectoryItems { get; set; } = [];
     }
