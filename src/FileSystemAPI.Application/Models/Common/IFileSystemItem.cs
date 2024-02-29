@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace FileSystemAPI.Domain.Common
 {
+    /// <summary>
+    /// Composite pattern: Component item 
+    /// </summary>
     public interface IFileSystemItem
     {
 

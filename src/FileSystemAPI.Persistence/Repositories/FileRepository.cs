@@ -15,8 +15,12 @@ namespace FileSystemAPI.Persistence.Repositories
         {
         }
 
+        /// <summary>
+        /// Adds file to file system, writes it to database and updates size of all ancestor folders
+        /// </summary>
         public async Task<Domain.Entities.File> AddFile(Domain.Entities.File file)
         {
+            // Using transaction because update of size for all ancestor has to be done as single operation unit
             using var transaction = _dbContext.Database.BeginTransaction();
 
             try
@@ -29,6 +33,7 @@ namespace FileSystemAPI.Persistence.Repositories
 
                     await this.AddAsync(file);
 
+                    // Climbing the folder ancestral hierarchy and updating size
                     long? parentId = file.FolderId;
                     while (parentId != null)
                     {
@@ -55,8 +60,12 @@ namespace FileSystemAPI.Persistence.Repositories
             return file!;
         }
 
+        /// <summary>
+        /// Updates file with same name in file system, writes it to database and updates size of all ancestor folders
+        /// </summary>
         public async Task<Domain.Entities.File> UpdateFile(Domain.Entities.File file, long newSize)
         {
+            // Using transaction because update of size for all ancestor has to be done as single operation unit
             using var transaction = _dbContext.Database.BeginTransaction();
 
             try
@@ -69,6 +78,7 @@ namespace FileSystemAPI.Persistence.Repositories
 
                     await this.UpdateAsync(file);
 
+                    // Climbing the folder ancestral hierarchy and updating size
                     long? parentId = file.FolderId;
                     while (parentId != null)
                     {
@@ -95,8 +105,12 @@ namespace FileSystemAPI.Persistence.Repositories
             return file!;
         }
 
+        /// <summary>
+        /// Deletes file from file system, deactivate it in database and updates size of all ancestor folders
+        /// </summary>
         public async Task DeleteFile(Domain.Entities.File file)
         {
+            // Using transaction because update of size for all ancestor has to be done as single operation unit
             using var transaction = _dbContext.Database.BeginTransaction();
 
             try
@@ -110,6 +124,7 @@ namespace FileSystemAPI.Persistence.Repositories
 
                     await this.UpdateAsync(file);
 
+                    // Climbing the folder ancestral hierarchy and updating size
                     long? parentId = file.FolderId;
                     while (parentId != null)
                     {
@@ -167,27 +182,37 @@ namespace FileSystemAPI.Persistence.Repositories
                                    .ToListAsync();
         }
 
+        /// <summary>
+        /// Searches for files in file system whose name starts with search string
+        /// </summary>
+        /// <param name="startFolderId">The ID of the Folder to start searching. Searching is continued in all subfolders.</param>
         public async Task<List<Domain.Entities.File>> SearchFile(long startFolderId, string searchString)
         {
             List<Domain.Entities.File> result = [];
 
+            // BFS search algorithm
             LinkedList<long> folderQueue = [];
 
             folderQueue.AddLast(startFolderId);
 
             while (folderQueue.Any())
             {
+                // Take first folder from queue
                 var folderId = folderQueue.First();
 
                 folderQueue.RemoveFirst();
 
+                // Get all search results in current folder
                 var files = await _dbContext.Files.Where(f => f.FolderId == folderId && f.Active == true && f.FileName.StartsWith(searchString))
                                                   .Include(f => f.Folder)
                                                   .ToListAsync();
 
+                // We need 10 results in search, do not take more than that
                 result.AddRange(files.Take(10 - result.Count));
+                // If 10 results are found, stop BFS algorithm
                 if (result.Count >= 10) break;
 
+                // Add subfolders to queue
                 var childFolders = await _dbContext.Folders.Where(f => f.ParentFolderId == folderId && f.Active == true)
                                                            .Select(f => f.Id)
                                                            .ToListAsync();

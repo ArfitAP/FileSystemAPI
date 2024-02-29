@@ -61,24 +61,26 @@ namespace FileSystemAPI.Application.Services
                         throw new Exception("Parent folder does not exists !");
                     }              
 
+                    // File with provided name already exists in folder, replace old file with new one
                     if (await _fileRepository.FileNameExistsInParent(createNewFileRequest.FileName, createNewFileRequest.FolderID))
                     {
                         var file = await _fileRepository.GetFileByNameAndParent(createNewFileRequest.FileName, createNewFileRequest.FolderID);
                         file.StoredFileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
 
-                        long size = await _storageHandler.WriteFileToStorage(createNewFileRequest.bytesBase64, file.StoredFileName);
+                        long size = await _storageHandler.WriteFileToStorage(createNewFileRequest.bytes, file.StoredFileName);
 
                         await _fileRepository.UpdateFile(file, size);
 
                         createNewFileResponse.File = _mapper.Map<FileModel>(file);
                     }
+                    // File with provided name does not exist, create new file in file system
                     else
                     {
                         var file = _mapper.Map<Domain.Entities.File>(createNewFileRequest);
                         file.Active = true;
                         file.StoredFileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
 
-                        long size = await _storageHandler.WriteFileToStorage(createNewFileRequest.bytesBase64, file.StoredFileName);
+                        long size = await _storageHandler.WriteFileToStorage(createNewFileRequest.bytes, file.StoredFileName);
 
                         file.Size = size;
 

@@ -160,9 +160,13 @@ namespace FileSystemAPI.Application.Services
                         throw new Exception("Folder does not exists !");
                     }
 
+                    // Get Folders in directory
                     var folders = await _folderRepository.GetFoldersInDirectory(listDirectoryRequest.FolderID);
+
+                    // Get Files in directory
                     var files = await _fileRepository.GetFilesInDirectory(listDirectoryRequest.FolderID);
 
+                    // Convert them to generic item and join for listing
                     List<DirectoryListingItem> items =
                     [
                         .. _mapper.Map<List<DirectoryListingItem>>(folders),

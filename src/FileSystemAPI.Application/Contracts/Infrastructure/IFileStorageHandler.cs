@@ -8,8 +8,16 @@ namespace FileSystemAPI.Application.Contracts.Infrastructure
 {
     public interface IFileStorageHandler
     {
-        public Task<long> WriteFileToStorage(string bytesBase64, string storageFileName);
+        /// <summary>
+        /// Writes file bytes to storage location defined in configuration
+        /// </summary>
+        /// <returns>Stored file size in bytes.</returns>
+        public Task<long> WriteFileToStorage(byte[] bytes, string storageFileName);
 
+        /// <summary>
+        /// Reads requested file bytes from storage location defined in configuration
+        /// </summary>
+        /// <returns>File bytes.</returns>
         public Task<byte[]> ReadFileFromStorage(string storageFileName);
     }
 }

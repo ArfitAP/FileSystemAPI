@@ -6,6 +6,10 @@ using System.Threading.Tasks;
 
 namespace FileSystemAPI.Application.Models.Common
 {
+    /// <summary>
+    /// Item that represent generic item in directory
+    /// Used in List directory response 
+    /// </summary>
     public class DirectoryListingItem
     {
         public long Id { get; set; }

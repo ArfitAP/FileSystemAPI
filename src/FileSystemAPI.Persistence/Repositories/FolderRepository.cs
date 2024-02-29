@@ -16,8 +16,12 @@ namespace FileSystemAPI.Persistence.Repositories
         {
         }
 
+        /// <summary>
+        /// Deletes folder from file system, deactivate it in database and updates size of all ancestor folders
+        /// </summary>
         public async Task DeleteFolder(Folder folder)
         {
+            // Using transaction because update of size for all ancestor has to be done as single operation unit
             using var transaction = _dbContext.Database.BeginTransaction();
 
             try
@@ -31,6 +35,7 @@ namespace FileSystemAPI.Persistence.Repositories
 
                     await this.UpdateAsync(folder);
 
+                    // Climbing the folder ancestral hierarchy and updating size
                     long? parentId = folder.ParentFolderId;
                     while (parentId != null)
                     {
@@ -45,6 +50,7 @@ namespace FileSystemAPI.Persistence.Repositories
                         else parentId = null;
                     }
 
+                    // Recursively delete all subfolders so they cannot be accesed by ID, we need to delete each of them from database, not only parent
                     await DeleteSubFolders(folder.Id);
                     await _dbContext.SaveChangesAsync();
                 }
@@ -58,8 +64,12 @@ namespace FileSystemAPI.Persistence.Repositories
             }
         }
 
+        /// <summary>
+        /// DFS walk through all subfolders of selected folder and deleting them
+        /// </summary>
         private async Task DeleteSubFolders(long folderId)
         {
+            // Delete containing files
             var files = await _dbContext.Files.Where(f => f.FolderId == folderId && f.Active == true).ToListAsync();
             foreach (var file in files) 
             {
@@ -67,16 +77,22 @@ namespace FileSystemAPI.Persistence.Repositories
                 file.DeletedDate = DateTime.Now;
             }
 
+            // Delete subfolders
             var folders = await _dbContext.Folders.Where(f => f.ParentFolderId == folderId && f.Active == true).ToListAsync();
             foreach (var folder in folders)
             {
                 folder.Active = false;
                 folder.DeletedDate = DateTime.Now;
 
+                // Recursive call - DFS
                 await DeleteSubFolders(folder.Id);
             }
         }
 
+
+        /// <summary>
+        /// Renames folder in file system, updates it in database and updates all the ancestor folders
+        /// </summary>
         public async Task RenameFolder(Folder folder, string newFolderName)
         {
             using var transaction = _dbContext.Database.BeginTransaction();
@@ -91,6 +107,7 @@ namespace FileSystemAPI.Persistence.Repositories
 
                     await _dbContext.SaveChangesAsync();
 
+                    // Update full path of subfolders because it contains this fodlers old name
                     await RenameSubFolders(folder.Id, folder.FullPath);
                     await _dbContext.SaveChangesAsync();
                 }
@@ -104,6 +121,9 @@ namespace FileSystemAPI.Persistence.Repositories
             }
         }
 
+        /// <summary>
+        /// DFS walk through all subfolders of selected folder and updating their full path
+        /// </summary>
         private async Task RenameSubFolders(long folderId, string folderFullPath)
         {
             var folders = await _dbContext.Folders.Where(f => f.ParentFolderId == folderId && f.Active == true).ToListAsync();
@@ -111,6 +131,7 @@ namespace FileSystemAPI.Persistence.Repositories
             {
                 folder.FullPath = Path.Combine(folderFullPath, folder.FolderName);
 
+                // Recursive call - DFS
                 await RenameSubFolders(folder.Id, folder.FullPath);
             }
         }

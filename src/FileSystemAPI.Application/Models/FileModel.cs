@@ -10,16 +10,29 @@ using System.Threading.Tasks;
 
 namespace FileSystemAPI.Application.Models
 {
+    /// <summary>
+    /// Composite pattern: Leaf item 
+    /// </summary>
     public class FileModel : AuditableEntity, IFileSystemItem
     {
         public long Id { get; set; }
+
         public ItemType Type { get; set; } = ItemType.File;
+
         public string FileName { get; set; } = string.Empty;
+
         [JsonIgnore]
         public string StoredFileName { get; set; } = string.Empty;
+
         public long Size { get; set; }
+
         public long FolderId { get; set; }
+
+        /// <summary>
+        /// Parent's folder full path
+        /// </summary>
         public string FullPath { get; set; } = string.Empty;
+
         [JsonIgnore]
         public bool Active { get; set; }
     }

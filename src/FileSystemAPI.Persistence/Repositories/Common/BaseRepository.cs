@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace FileSystemAPI.Persistence.Repositories.Common
 {
+    /// <summary>
+    /// Common repository with standard CRUD operations
+    /// </summary>
     public class BaseRepository<T> : IAsyncRepository<T> where T : class
     {
         protected readonly FileSystemDbContext _dbContext;

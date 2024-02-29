@@ -23,10 +23,8 @@ namespace FileSystemAPI.Infrastructure.Services
             return bytes;
         }
 
-        public async Task<long> WriteFileToStorage(string bytesBase64, string storageFileName)
+        public async Task<long> WriteFileToStorage(byte[] bytes, string storageFileName)
         {
-            byte[] bytes = Convert.FromBase64String(bytesBase64);
-
             await File.WriteAllBytesAsync(Path.Combine(_configuration["StoragePath"]!, storageFileName), bytes);
 
             return bytes.Length;

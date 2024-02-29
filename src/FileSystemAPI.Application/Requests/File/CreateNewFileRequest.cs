@@ -10,6 +10,6 @@ namespace FileSystemAPI.Application.Requests.File
     {
         public string FileName { get; set; } = string.Empty;
         public long FolderID { get; set; }
-        public string bytesBase64 { get; set; } = string.Empty;
+        public byte[] bytes { get; set; } = Array.Empty<byte>();
     }
 }

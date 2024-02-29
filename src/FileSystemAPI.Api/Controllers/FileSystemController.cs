@@ -25,7 +25,11 @@ namespace FileSystemAPI.Api.Controllers
             _configuration = configuration;
         }
 
-
+        /// <summary>
+        /// Creates a new Folder in file system.
+        /// </summary>
+        /// <param name="createNewFolderRequest">The Folder item to create.</param>
+        /// <returns>The newly created Folder item.</returns>
         [HttpPost("CreateNewFolder", Name = "CreateNewFolder")]
         public async Task<ActionResult<CreateNewFolderResponse>> CreateNewFolder([FromBody] CreateNewFolderRequest createNewFolderRequest)
         {
@@ -41,6 +45,11 @@ namespace FileSystemAPI.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Renames a Folder.
+        /// </summary>
+        /// <param name="renameFolderRequest">The Folder item to rename.</param>
+        /// <returns>The updated Folder item.</returns>
         [HttpPut("RenameFolder", Name = "RenameFolder")]
         public async Task<ActionResult<RenameFolderResponse>> RenameFolder([FromBody] RenameFolderRequest renameFolderRequest)
         {
@@ -56,6 +65,11 @@ namespace FileSystemAPI.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Deletes a Folder by ID.
+        /// </summary>
+        /// <param name="deleteFolderRequest">The request containing ID of the Folder to delete.</param>
+        /// <returns>Default API response with status.</returns>
         [HttpDelete("DeleteFolder", Name = "DeleteFolder")]
         public async Task<ActionResult<DeleteFolderResponse>> DeleteFolder([FromBody] DeleteFolderRequest deleteFolderRequest)
         {
@@ -71,6 +85,11 @@ namespace FileSystemAPI.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Lists all items in Folder.
+        /// </summary>
+        /// <param name="folderId">The ID of the Folder to list items from.</param>
+        /// <returns>List of all items in Folder with item details.</returns>
         [HttpGet("ListDirectory/{folderId}", Name = "ListDirectory")]
         public async Task<ActionResult<ListDirectoryResponse>> ListDirectory([FromRoute] int folderId)
         {
@@ -88,10 +107,27 @@ namespace FileSystemAPI.Api.Controllers
             }
         }
 
-
-        [HttpPost("CreateNewFile", Name = "CreateNewFile")]
-        public async Task<ActionResult<CreateNewFileResponse>> CreateNewFile([FromBody] CreateNewFileRequest createNewFileRequest)
+        /// <summary>
+        /// Creates a new File in file system.
+        /// </summary>
+        /// <param name="folderId">The Folder ID to create File in.</param>
+        /// <param name="file">The File binary data.</param>
+        /// <returns>The newly created File item.</returns>
+        [HttpPost("CreateNewFile/{folderId}", Name = "CreateNewFile")]
+        public async Task<ActionResult<CreateNewFileResponse>> CreateNewFile([FromRoute] int folderId, IFormFile file)
         {
+            byte[] buffer;
+            using (MemoryStream ms = new MemoryStream())
+            {
+                await file.CopyToAsync(ms);
+                buffer = ms.ToArray();
+            }
+
+            CreateNewFileRequest createNewFileRequest = new();
+            createNewFileRequest.FileName = file.FileName;
+            createNewFileRequest.FolderID = folderId;
+            createNewFileRequest.bytes = buffer;
+
             var response = await _fileService.CreateNewFile(createNewFileRequest);
 
             if (response.Success)
@@ -104,6 +140,11 @@ namespace FileSystemAPI.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Renames a File.
+        /// </summary>
+        /// <param name="renameFileRequest">The File item to rename.</param>
+        /// <returns>The updated File item.</returns>
         [HttpPut("RenameFile", Name = "RenameFile")]
         public async Task<ActionResult<RenameFileResponse>> RenameFile([FromBody] RenameFileRequest renameFileRequest)
         {
@@ -119,6 +160,11 @@ namespace FileSystemAPI.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Deletes a File by ID.
+        /// </summary>
+        /// <param name="deleteFileRequest">The request containing ID of the File to delete.</param>
+        /// <returns>Default API response with status.</returns>
         [HttpDelete("DeleteFile", Name = "DeleteFile")]
         public async Task<ActionResult<DeleteFileResponse>> DeleteFile([FromBody] DeleteFileRequest deleteFileRequest)
         {
@@ -134,9 +180,13 @@ namespace FileSystemAPI.Api.Controllers
             }
         }
 
-
+        /// <summary>
+        /// Get File binary data for downloading.
+        /// </summary>
+        /// <param name="fileId">The ID of the File to download.</param>
+        /// <returns>File response.</returns>
         [HttpGet("GetFile/{fileId}", Name = "GetFile")]
-        public async Task<ActionResult<GetFileResponse>> GetFile([FromRoute] int fileId)
+        public async Task<IActionResult> GetFile([FromRoute] int fileId)
         {
             GetFileRequest getFileRequest = new() { FileID = fileId };
 
@@ -152,6 +202,13 @@ namespace FileSystemAPI.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Searches for a File in specific folder or across whole repository. 
+        /// Caches results for specific time so next searches are faster 
+        /// (useful for searching in search box while typing because of lot of searches in short period of time).
+        /// </summary>
+        /// <param name="searchFileRequest">Search data: string and folder to search in.</param>
+        /// <returns>File search top 10 results.</returns>
         [HttpPost("SearchFile", Name = "SearchFile")]
         public async Task<ActionResult<SearchFileResponse>> SearchFile([FromBody] SearchFileRequest searchFileRequest)
         {

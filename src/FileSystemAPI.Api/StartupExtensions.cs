@@ -2,6 +2,7 @@
 using FileSystemAPI.Application;
 using FileSystemAPI.Infrastructure;
 using Serilog;
+using Microsoft.AspNetCore.Http.Features;
 
 namespace FileSystemAPI.Api
 {
@@ -27,6 +28,12 @@ namespace FileSystemAPI.Api
             });
 
             builder.Host.UseSerilog((hostingContext, loggerConfiguration) => loggerConfiguration.ReadFrom.Configuration(hostingContext.Configuration));
+
+            builder.Services.Configure<FormOptions>(options =>
+            {
+                // Set the size limit
+                options.MultipartBodyLengthLimit = long.Parse(builder.Configuration["MaxUploadSizeInBytes"]!);
+            });
 
             return builder.Build();
         }
